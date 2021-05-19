@@ -7,9 +7,8 @@ import com.hootboard.assignment.repository.UserRepository;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import javax.naming.AuthenticationException;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.websocket.AuthenticationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,23 +23,25 @@ public class AuthorizationManager {
       .maximumSize(1000)
       .build();
 
-  @Autowired
-  UserRepository userRepository;
+  private final UserRepository userRepository;
+
+  public AuthorizationManager(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   public String checkAuthorization(String authHeader) throws Exception {
     if (authHeader != null && authHeader.startsWith("Basic")) {
       Users resultFromDB = getFromDb(authHeader);
-      if (authCache.getIfPresent(resultFromDB.getId()) != null) {
+      if (resultFromDB != null && authCache.getIfPresent(resultFromDB.getId()) != null) {
         return authCache.getIfPresent(resultFromDB.getId());
-      } else {
+      } else if (resultFromDB != null) {
         String authToken = UUID.randomUUID().toString();
         authCache.put(resultFromDB.getId(), authToken);
         tokenCache.put(authToken, resultFromDB.getId());
         return authToken;
       }
-    } else {
-      throw new AuthenticationException("The authorization header is either empty or isn't Basic.");
     }
+    throw new AuthenticationException("The authorization header is either empty or isn't Basic.");
   }
 
   public Boolean logOut(String authHeader) {

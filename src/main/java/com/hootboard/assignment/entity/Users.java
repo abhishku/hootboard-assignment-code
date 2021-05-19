@@ -65,6 +65,10 @@ public class Users implements Serializable {
     this.firstName = firstName;
   }
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
