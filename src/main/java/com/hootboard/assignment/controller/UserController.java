@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.naming.AuthenticationException;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class UserController {
 
@@ -37,7 +39,7 @@ public class UserController {
 
   @PostMapping("/user/create")
   public Status registerUser(@Valid @RequestBody CreateUserRequest newUserRequest) {
-    System.out.println("Create user Request received: " + newUserRequest.toString());
+    log.trace("Create user Request received: " + newUserRequest.toString());
     try {
       if (userRepository.findByUsername(newUserRequest.getUsername()) != null) {
         return Status.USER_ALREADY_EXISTS;
@@ -92,7 +94,7 @@ public class UserController {
     Optional<Users> us = userRepository.findById(userId);
     if (us.isPresent()) {
       Users user = us.get();
-      System.out.println("Update Request Received " + updateUserRequest.toString());
+      log.trace("Update Request Received " + updateUserRequest.toString());
       if (updateUserRequest.getUsername() != null) {
         user.setUsername(updateUserRequest.getUsername());
       }

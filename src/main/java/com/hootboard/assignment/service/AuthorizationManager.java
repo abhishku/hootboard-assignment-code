@@ -8,9 +8,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.naming.AuthenticationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthorizationManager {
 
@@ -48,8 +50,8 @@ public class AuthorizationManager {
     if (authHeader != null && authHeader.startsWith("Basic")) {
       Users resultFromDB = getFromDb(authHeader);
       if (resultFromDB != null) {
-        System.out.println("Removing this from cache: " + resultFromDB.getUsername());
-        System.out.println("Removing Token cache: " + authCache.getIfPresent(resultFromDB.getId()));
+        log.trace("Removing this from cache: " + resultFromDB.getUsername());
+        log.trace("Removing Token cache: " + authCache.getIfPresent(resultFromDB.getId()));
         if (authCache.getIfPresent(resultFromDB.getId()) != null) {
           tokenCache.invalidate(authCache.getIfPresent(resultFromDB.getId()));
           authCache.invalidate(resultFromDB.getId());

@@ -1,12 +1,14 @@
 package com.hootboard.assignment.controller;
 
 import com.hootboard.assignment.service.AuthorizationManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class AuthController {
 
@@ -15,7 +17,7 @@ public class AuthController {
 
   @PostMapping("/user/logout")
   public HttpStatus logoutUser(@RequestHeader("Authorization") String authHeader) {
-    System.out.println("Logout request received: " + authHeader);
+    log.trace("Logout request received: " + authHeader);
     if (authorizationManager.logOut(authHeader)) {
       return HttpStatus.OK;
     } else {
